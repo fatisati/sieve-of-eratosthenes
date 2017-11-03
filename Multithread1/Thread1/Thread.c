@@ -23,6 +23,9 @@
 void ThreadProc(void *param);
 int size;
 int *arr;
+int *check;
+int *val;
+HANDLE *handle;
 
 // First thread 
 int main()
@@ -31,8 +34,9 @@ int main()
 
 	int n;
 	int i;
-	int val = 0;
-	HANDLE handle;
+	
+	size = 1000000;
+	//HANDLE handle[size];
 	
 	printf("\t Thread Demo\n");
 
@@ -48,15 +52,23 @@ int main()
 //		
 //		
 //	}
-	size = 10000000;
 	arr = (int *)malloc(sizeof(int) * size);
+	val = (int *)malloc(sizeof(int) * size);
+	check = (int *)malloc(sizeof(int) * size);
+	handle = (HANDLE *)malloc(sizeof(HANDLE) * size);
+	
+	//handle[0] = (HANDLE) _beginthread(ThreadProc,0,&val);
+	//handle[1] = (HANDLE) _beginthread(ThreadProc,0,&val);
+
+
 	for(i=0; i<size; i++){
-		arr[i] = 0;
+		arr[i] = 1;
+		check[i] = 0;
 	}
 	int flag= 1;
 	for(i=2; i<size; i++){
 		
-		arr[i]++;
+		//arr[i] = 1;
 		if(arr[i] == 1){
 						
 			if(flag){
@@ -65,9 +77,10 @@ int main()
 				}
 				
 				else{
-					val = i;
-					handle = (HANDLE) _beginthread(ThreadProc,0,&val); // create thread
-					WaitForSingleObject(handle,INFINITE);
+					val[i] = i;
+					printf("called %d:\n", val[i]);
+					handle[i] = (HANDLE) _beginthread(ThreadProc,0,&val[i]); // create thread
+					check[i] = 1;
 				}
 				
 			}
@@ -75,17 +88,19 @@ int main()
 		}
 	}
 	
-//	for(i=2; i<size; i++){
-//		if(arr[i] == 1){
-//			printf("%d ",i);
-//		}
-//	}
-MEMORYSTATUSEX memInfo;
-	memInfo.dwLength = sizeof(MEMORYSTATUSEX);
-	GlobalMemoryStatusEx(&memInfo);
-	DWORDLONG totalVirtualMem = memInfo.ullTotalPageFile;
-	DWORDLONG virtualMemUsed = memInfo.ullTotalPageFile - memInfo.ullAvailPageFile;
-	printf("%d", virtualMemUsed);
+	for(i=2; i<size; i++){
+		if(check[i] == 1){
+			WaitForSingleObject(handle[i],INFINITE);
+		}
+	}
+	int count =0;
+	for(i=2; i<size; i++){
+		if(arr[i] == 1){
+			printf("%d ", i);
+			count++;
+		}
+	}
+	printf("%d", count);
 	return 0;
 }
 
@@ -93,13 +108,12 @@ MEMORYSTATUSEX memInfo;
 void ThreadProc(void *param)
 {
 	
-	int i=*((int*)param);
-	//printf("%d Thread is Running!\n",i);
+	int i = *((int*)param);
+	//printf("Thread %d is Running!\n",i);
 	long j;
 	for(j= i*i; j<size; j= j+i){
-					arr[j]++;
+					arr[j] = 0;
 	}
 	_endthread();
-
 }
 

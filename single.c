@@ -17,7 +17,7 @@
 
 #define WIDTH 7
 int main(){
-	int size = 10000000;
+	int size = 1000000;
 	int *arr;
 	arr = (int *)malloc(sizeof(int) * size);
 	int i;
@@ -45,13 +45,13 @@ int main(){
 		}
 	}
 	
-	MEMORYSTATUSEX memInfo;
-	memInfo.dwLength = sizeof(MEMORYSTATUSEX);
-	GlobalMemoryStatusEx(&memInfo);
-	DWORDLONG totalVirtualMem = memInfo.ullTotalPageFile;
-	DWORDLONG virtualMemUsed = memInfo.ullTotalPageFile - memInfo.ullAvailPageFile;
-	PROCESS_MEMORY_COUNTERS_EX pmc;
-	
-GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc)); 	
-	SIZE_T virtualMemUsedByMe = pmc.PrivateUsage;
+	int count =0;
+	for(i=2; i<size; i++){
+		if(arr[i] == 1){
+			printf("%d ", i);
+			count++;
+		}
+	}
+	printf("\n%d", count);
+	return 0;
 }
